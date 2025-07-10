@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/enzodmrib/go-bid/internal/jsonutils"
@@ -16,6 +17,11 @@ func (api *Api) HandleGetCSRFToken(w http.ResponseWriter, r *http.Request) {
 
 func (api *Api) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for name, values := range r.Header {
+			for _, value := range values {
+				fmt.Printf("%s: %s\n", name, value)
+			}
+		}
 		if !api.Sessions.Exists(r.Context(), "AuthenticatedUserId") {
 			jsonutils.EncodeJson(w, r, http.StatusUnauthorized, map[string]any{
 				"message": "must be logged in",
